@@ -603,10 +603,10 @@ def replay(update, context):
 
 
 def message_receive(update, context):
-
+    message = literal_eval(str(update.message))
+    message_chat_id = message["chat"].get("id")
+    
     try:
-        message = literal_eval(str(update.message))
-        message_chat_id = message["chat"].get("id")
 
         if message.get("reply_to_message") != None:
             message["reply_to_message"] = my_pop(message["reply_to_message"])
