@@ -13,31 +13,37 @@ from telegram.ext import (
     Updater,
 )
 
+import TheConfig
+
 # --------- for enable the firebase database --------- #
 
-config2 = {
-    "apiKey": "AIzaSyCQou2GNxE8BZBohrh0iUYAhU2GQsiauug",
-    "authDomain": "telegram-bot-f6779.firebaseapp.com",
-    "databaseURL": "https://telegram-bot-f6779.firebaseio.com",
-    "storageBucket": "telegram-bot-f6779.appspot.com",
-}
-firebase2 = pyrebase.initialize_app(config2)
+firebase2 = pyrebase.initialize_app(TheConfig.config2)
 db2 = firebase2.database()
 
-config = {
-    "apiKey": "AIzaSyCmNQjaN2duGUUxWF-FxF9ubawb0LSHMVk",
-    "authDomain": "reply-bot-for-telegram.firebaseapp.com",
-    "databaseURL": "https://reply-bot-for-telegram.firebaseio.com",
-    "storageBucket": "reply-bot-for-telegram.appspot.com",
-}
-firebase = pyrebase.initialize_app(config)
+firebase = pyrebase.initialize_app(TheConfig.config)
 db = firebase.database()
 
 # --------- for enable the telegram bot --------- #
 
-token = "1309329858:AAGdZIqTFEhbW-oQp0IOrZVurAbwuT-S2SI"
-updater = Updater(token, use_context=True)
-bot = Bot(token)
+updater = Updater(TheConfig.token, use_context=True)
+bot = Bot(TheConfig.token)
+
+#
+
+the_bot = {}
+bot_message = {"text": " "}
+
+keyboard4 = [
+    [InlineKeyboardButton("Add New Massage", callback_data="ADD")],
+    [InlineKeyboardButton("Delete a Message", callback_data="DELETE")],
+    [InlineKeyboardButton("Send a Random Message", callback_data="RANDOM")],
+    [InlineKeyboardButton("Stop The Bot", callback_data="STOP")],
+]
+
+keyboard2 = [
+    [InlineKeyboardButton("Add New Massage", callback_data="ADD")],
+    [InlineKeyboardButton("Stop The Bot", callback_data="STOP")],
+]
 
 
 def error_handle(context, chat_id, error):
@@ -186,14 +192,13 @@ def start(update, context):
 
 def button(update, context):
 
-    global button_message_id, button_message_text, query, button_clicker_username, bot_message, the_message_in_firebase
+    global bot_message
 
     try:
         query = update.callback_query
         query_dic = literal_eval(str(query))
         button_chat_id = query_dic["message"]["chat"]["id"]
         button_message_id = query_dic["message"]["message_id"]
-        button_message_text = query_dic["message"]["text"]
         button_clicker_id = query_dic["from"]["id"]
         button_clicker_username = the_username(query_dic)
 
@@ -603,10 +608,10 @@ def replay(update, context):
 
 
 def message_receive(update, context):
-    message = literal_eval(str(update.message))
-    message_chat_id = message["chat"].get("id")
 
     try:
+        message = literal_eval(str(update.message))
+        message_chat_id = message["chat"].get("id")
 
         if message.get("reply_to_message") != None:
             message["reply_to_message"] = my_pop(message["reply_to_message"])
@@ -634,22 +639,6 @@ def message_receive(update, context):
     except:
         error = traceback.format_exc()
         error_handle(context, message_chat_id, error)
-
-
-the_bot = {}
-bot_message = {"text": " "}
-
-keyboard4 = [
-    [InlineKeyboardButton("Add New Massage", callback_data="ADD")],
-    [InlineKeyboardButton("Delete a Message", callback_data="DELETE")],
-    [InlineKeyboardButton("Send a Random Message", callback_data="RANDOM")],
-    [InlineKeyboardButton("Stop The Bot", callback_data="STOP")],
-]
-
-keyboard2 = [
-    [InlineKeyboardButton("Add New Massage", callback_data="ADD")],
-    [InlineKeyboardButton("Stop The Bot", callback_data="STOP")],
-]
 
 
 def main():
