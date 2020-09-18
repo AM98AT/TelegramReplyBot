@@ -129,10 +129,3 @@ dmypy.json
 .pyre/
 
 # My add
-.vscode/
-.vscode
-/vscode
-/.vscode
-/.vscode/
-
-test/
