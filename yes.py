@@ -5,7 +5,13 @@ from datetime import datetime
 
 import pyrebase
 from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import CallbackQueryHandler, CommandHandler, Filters, MessageHandler, Updater
+from telegram.ext import (
+    CallbackQueryHandler,
+    CommandHandler,
+    Filters,
+    MessageHandler,
+    Updater,
+)
 
 # --------- for enable the firebase database --------- #
 
@@ -40,14 +46,19 @@ def error_handle(context, chat_id, error):
 
     try:
         context.bot.delete_message(
-            chat_id=chat_id, message_id=bot_message["message_id"])
+            chat_id=chat_id, message_id=bot_message["message_id"]
+        )
 
     except:
         pass
 
     bot_message = context.bot.send_message(
-        chat_id=chat_id, text="Sorry there is a error the bot will stop\nto reactive the bot please click /start")
-    context.bot.send_message(chat_id=99781774, text=f"the error in chat {chat_id} \n{error}")
+        chat_id=chat_id,
+        text="Sorry there is a error the bot will stop\nto reactive the bot please click /start",
+    )
+    context.bot.send_message(
+        chat_id=99781774, text=f"the error in chat {chat_id} \n{error}"
+    )
 
 
 def get_file_id(file_id):
@@ -126,7 +137,8 @@ def start(update, context):
 
         try:
             context.bot.delete_message(
-                chat_id=the_start_message["chat"]["id"], message_id=bot_message["message_id"],
+                chat_id=the_start_message["chat"]["id"],
+                message_id=bot_message["message_id"],
             )
 
         except:
@@ -142,15 +154,28 @@ def start(update, context):
             reply_markup = InlineKeyboardMarkup(keyboard2)
 
         mess = update.message.reply_text(
-            "Please choose what you want :", reply_markup=reply_markup)
+            "Please choose what you want :", reply_markup=reply_markup
+        )
 
         if the_start_message["chat"]["id"] in the_bot.keys():
-            the_bot[the_start_message["chat"]["id"]][the_start_message["from"]["id"]] = {
-                "state": "start", "random message": 0, "message_id": mess["message_id"], "username": the_username(the_start_message)}
+            the_bot[the_start_message["chat"]["id"]][
+                the_start_message["from"]["id"]
+            ] = {
+                "state": "start",
+                "random message": 0,
+                "message_id": mess["message_id"],
+                "username": the_username(the_start_message),
+            }
 
         else:
-            the_bot[the_start_message["chat"]["id"]] = {the_start_message["from"]["id"]: {
-                "state": "start", "random message": 0, "message_id": mess["message_id"], "username": the_username(the_start_message)}}
+            the_bot[the_start_message["chat"]["id"]] = {
+                the_start_message["from"]["id"]: {
+                    "state": "start",
+                    "random message": 0,
+                    "message_id": mess["message_id"],
+                    "username": the_username(the_start_message),
+                }
+            }
 
     except:
         error = traceback.format_exc()
@@ -176,21 +201,38 @@ def button(update, context):
 
             if query.data == "ADD":
 
-                mess = query.edit_message_text(text=f"{button_clicker_username} To add new massage please reply to the message")
+                mess = query.edit_message_text(
+                    text=f"{button_clicker_username} To add new massage please reply to the message"
+                )
                 the_bot[button_chat_id][button_clicker_id] = {
-                    "state": "ADD", "random message": 0, "message_id": mess["message_id"], "username": button_clicker_username}
+                    "state": "ADD",
+                    "random message": 0,
+                    "message_id": mess["message_id"],
+                    "username": button_clicker_username,
+                }
 
             elif query.data == "DELETE":
 
-                mess = query.edit_message_text(text=f"{button_clicker_username} To delete any message please reply to the message")
+                mess = query.edit_message_text(
+                    text=f"{button_clicker_username} To delete any message please reply to the message"
+                )
                 the_bot[button_chat_id][button_clicker_id] = {
-                    "state": "DELETE", "random message": 0, "message_id": mess["message_id"], "username": button_clicker_username}
+                    "state": "DELETE",
+                    "random message": 0,
+                    "message_id": mess["message_id"],
+                    "username": button_clicker_username,
+                }
 
             elif query.data == "STOP":
 
                 context.bot.delete_message(
-                    chat_id=button_chat_id, message_id=the_bot[button_chat_id][button_clicker_id]["message_id"])
-                context.bot.send_message(chat_id=button_chat_id, text=f"{button_clicker_username} you lost the access to the bot now")
+                    chat_id=button_chat_id,
+                    message_id=the_bot[button_chat_id][button_clicker_id]["message_id"],
+                )
+                context.bot.send_message(
+                    chat_id=button_chat_id,
+                    text=f"{button_clicker_username} you lost the access to the bot now",
+                )
 
                 the_bot[button_chat_id].pop(button_clicker_id)
 
@@ -202,109 +244,189 @@ def button(update, context):
                     reply_markup = InlineKeyboardMarkup(keyboard4)
 
                     for i in the_users:
-                        context.bot.send_message(chat_id=button_chat_id, text=f'{the_bot[button_chat_id][i]["username"]} still has access to the bot ', reply_markup=reply_markup)
+                        context.bot.send_message(
+                            chat_id=button_chat_id,
+                            text=f'{the_bot[button_chat_id][i]["username"]} still has access to the bot ',
+                            reply_markup=reply_markup,
+                        )
 
             elif query.data == "RANDOM":
 
                 context.bot.delete_message(
-                    chat_id=button_chat_id, message_id=the_bot[button_chat_id][button_clicker_id]["message_id"])
+                    chat_id=button_chat_id,
+                    message_id=the_bot[button_chat_id][button_clicker_id]["message_id"],
+                )
 
                 while True:
 
                     try:
-                        chat_id_in_firebase = db.child("all_message").child(
-                            str(button_chat_id)).shallow().get()
+                        chat_id_in_firebase = (
+                            db.child("all_message")
+                            .child(str(button_chat_id))
+                            .shallow()
+                            .get()
+                        )
                         messages_in_chat_id_in_firebase = list(
-                            chat_id_in_firebase.val())
+                            chat_id_in_firebase.val()
+                        )
                         the_random_key = random.randint(
-                            0, len(messages_in_chat_id_in_firebase) - 1)
-                        the_message_in_firebase = messages_in_chat_id_in_firebase[the_random_key]
+                            0, len(messages_in_chat_id_in_firebase) - 1
+                        )
+                        the_message_in_firebase = messages_in_chat_id_in_firebase[
+                            the_random_key
+                        ]
 
-                        random_message = db.child("all_message").child(
-                            str(button_chat_id)).child(str(the_message_in_firebase)).get()
+                        random_message = (
+                            db.child("all_message")
+                            .child(str(button_chat_id))
+                            .child(str(the_message_in_firebase))
+                            .get()
+                        )
 
                         info_of_random_message = dict(random_message.val())
 
                         keyboard5 = [
-                            [InlineKeyboardButton(
-                                "Add New Massage", callback_data="ADD")],
-                            [InlineKeyboardButton(
-                                "Delete a Message", callback_data="DELETE")],
-                            [InlineKeyboardButton(
-                                "Send a Random Message", callback_data="RANDOM",)],
-                            [InlineKeyboardButton(
-                                "Stop The Bot", callback_data="STOP")],
-                            [InlineKeyboardButton(
-                                "Delete the Random Message", callback_data="DELETE THIS",)],
+                            [
+                                InlineKeyboardButton(
+                                    "Add New Massage", callback_data="ADD"
+                                )
+                            ],
+                            [
+                                InlineKeyboardButton(
+                                    "Delete a Message", callback_data="DELETE"
+                                )
+                            ],
+                            [
+                                InlineKeyboardButton(
+                                    "Send a Random Message",
+                                    callback_data="RANDOM",
+                                )
+                            ],
+                            [
+                                InlineKeyboardButton(
+                                    "Stop The Bot", callback_data="STOP"
+                                )
+                            ],
+                            [
+                                InlineKeyboardButton(
+                                    "Delete the Random Message",
+                                    callback_data="DELETE THIS",
+                                )
+                            ],
                         ]
                         reply_markup = InlineKeyboardMarkup(keyboard5)
 
                         context.bot.send_message(
-                            chat_id=button_chat_id, text=f'"{the_username(info_of_random_message)}" save this message\n' f"with caption \"{info_of_random_message['text']}\" \nat {datetime.fromtimestamp(info_of_random_message['date'])}", reply_to_message_id=the_message_in_firebase,
+                            chat_id=button_chat_id,
+                            text=f'"{the_username(info_of_random_message)}" save this message\n'
+                            f"with caption \"{info_of_random_message['text']}\" \nat {datetime.fromtimestamp(info_of_random_message['date'])}",
+                            reply_to_message_id=the_message_in_firebase,
                         )
 
                         mess = context.bot.send_message(
-                            chat_id=button_chat_id, text="Please choose what you want :", reply_markup=reply_markup,)
+                            chat_id=button_chat_id,
+                            text="Please choose what you want :",
+                            reply_markup=reply_markup,
+                        )
                         the_bot[button_chat_id][button_clicker_id] = {
-                            "state": "RANDOM", "random message": the_message_in_firebase, "message_id": mess["message_id"], "username": button_clicker_username}
+                            "state": "RANDOM",
+                            "random message": the_message_in_firebase,
+                            "message_id": mess["message_id"],
+                            "username": button_clicker_username,
+                        }
 
                         break
 
                     except TypeError:
                         reply_markup = InlineKeyboardMarkup(keyboard2)
                         mess = context.bot.send_message(
-                            chat_id=button_chat_id, text="I don't have any massage please add some", reply_markup=reply_markup,)
+                            chat_id=button_chat_id,
+                            text="I don't have any massage please add some",
+                            reply_markup=reply_markup,
+                        )
                         the_bot[button_chat_id][button_clicker_id] = {
-                            "state": "Nothing", "random message": 0, "message_id": mess["message_id"], "username": button_clicker_username}
+                            "state": "Nothing",
+                            "random message": 0,
+                            "message_id": mess["message_id"],
+                            "username": button_clicker_username,
+                        }
 
                         break
 
                     except:
                         db.child("all_message").child(str(button_chat_id)).child(
-                            str(the_message_in_firebase)).remove()
+                            str(the_message_in_firebase)
+                        ).remove()
 
             elif query.data == "DELETE THIS":
 
-                message_id = the_bot[button_chat_id][button_clicker_id]["random message"]
+                message_id = the_bot[button_chat_id][button_clicker_id][
+                    "random message"
+                ]
 
                 if message_id != 0:
 
-                    db.child("all_message").child(
-                        str(button_chat_id)).child(str(message_id)).remove()
+                    db.child("all_message").child(str(button_chat_id)).child(
+                        str(message_id)
+                    ).remove()
 
                     reply_markup = InlineKeyboardMarkup(keyboard4)
 
                     context.bot.delete_message(
-                        chat_id=button_chat_id, message_id=the_bot[button_chat_id][button_clicker_id]["message_id"])
+                        chat_id=button_chat_id,
+                        message_id=the_bot[button_chat_id][button_clicker_id][
+                            "message_id"
+                        ],
+                    )
 
                     context.bot.send_message(
-                        chat_id=button_chat_id, text="This message has been deleted", reply_to_message_id=message_id,
+                        chat_id=button_chat_id,
+                        text="This message has been deleted",
+                        reply_to_message_id=message_id,
                     )
 
                     mess = context.bot.send_message(
-                        chat_id=button_chat_id, text="Please choose what you want :", reply_markup=reply_markup,)
+                        chat_id=button_chat_id,
+                        text="Please choose what you want :",
+                        reply_markup=reply_markup,
+                    )
                     the_bot[button_chat_id][button_clicker_id] = {
-                        "state": "RANDOM", "random message": 0, "message_id": mess["message_id"], "username": button_clicker_username}
+                        "state": "RANDOM",
+                        "random message": 0,
+                        "message_id": mess["message_id"],
+                        "username": button_clicker_username,
+                    }
 
                 else:
 
                     context.bot.delete_message(
-                        chat_id=button_chat_id, message_id=button_message_id)
+                        chat_id=button_chat_id, message_id=button_message_id
+                    )
 
             else:
                 the_bot[button_chat_id][button_clicker_id] = {
-                    "state": "NOTHING", "random message": 0, "username": button_clicker_username}
+                    "state": "NOTHING",
+                    "random message": 0,
+                    "username": button_clicker_username,
+                }
 
         else:
             try:
                 context.bot.delete_message(
-                    chat_id=button_chat_id, message_id=button_message_id)
+                    chat_id=button_chat_id, message_id=button_message_id
+                )
 
             except:
                 pass
 
-            if bot_message["text"] != f"{button_clicker_username} you don't have access to the bot if you want to use it click /start":
-                bot_message = context.bot.send_message(chat_id=button_chat_id, text=f"{button_clicker_username} you don't have access to the bot if you want to use it click /start",)
+            if (
+                bot_message["text"]
+                != f"{button_clicker_username} you don't have access to the bot if you want to use it click /start"
+            ):
+                bot_message = context.bot.send_message(
+                    chat_id=button_chat_id,
+                    text=f"{button_clicker_username} you don't have access to the bot if you want to use it click /start",
+                )
 
     except:
         error = traceback.format_exc()
@@ -327,51 +449,76 @@ def replay(update, context):
 
             mess_id = db.child("all_message").get()
             chats_id_in_firebase = mess_id.val().keys()
-            message_id_for_reply = reply_message["reply_to_message"].get(
-                "message_id")
+            message_id_for_reply = reply_message["reply_to_message"].get("message_id")
 
             if the_bot[reply_chat_id][reply_user_id]["state"] == "ADD":
 
                 reply_message = my_pop(reply_message)
                 reply_message["reply_to_message"] = my_pop(
-                    reply_message["reply_to_message"])
+                    reply_message["reply_to_message"]
+                )
                 reply_message["reply_to_message"] = file_path(
-                    reply_message["reply_to_message"])
+                    reply_message["reply_to_message"]
+                )
 
                 if str(reply_chat_id) not in chats_id_in_firebase:
                     db.child("all_message").child(str(reply_chat_id)).set(
-                        {message_id_for_reply: reply_message})
+                        {message_id_for_reply: reply_message}
+                    )
 
                 else:
                     db.child("all_message").child(str(reply_chat_id)).update(
-                        {message_id_for_reply: reply_message})
+                        {message_id_for_reply: reply_message}
+                    )
 
                 try:
                     context.bot.delete_message(
-                        chat_id=reply_chat_id, message_id=the_bot[reply_chat_id][reply_user_id]["message_id"])
+                        chat_id=reply_chat_id,
+                        message_id=the_bot[reply_chat_id][reply_user_id]["message_id"],
+                    )
 
                     context.bot.send_message(
-                        chat_id=reply_chat_id, text="This massage has been added", reply_to_message_id=message_id_for_reply,
+                        chat_id=reply_chat_id,
+                        text="This massage has been added",
+                        reply_to_message_id=message_id_for_reply,
                     )
 
                     mess = context.bot.send_message(
-                        chat_id=reply_chat_id, text="Please choose what you want :", reply_markup=reply_markup,)
+                        chat_id=reply_chat_id,
+                        text="Please choose what you want :",
+                        reply_markup=reply_markup,
+                    )
                     the_bot[reply_chat_id][reply_user_id] = {
-                        "state": "Add", "random message": 0, "message_id": mess["message_id"], "username": the_username(reply_message)}
+                        "state": "Add",
+                        "random message": 0,
+                        "message_id": mess["message_id"],
+                        "username": the_username(reply_message),
+                    }
 
                 except:
                     reply_markup = InlineKeyboardMarkup(keyboard4)
                     mess = context.bot.send_message(
-                        chat_id=reply_chat_id, text="I can't add this message", reply_markup=reply_markup)
+                        chat_id=reply_chat_id,
+                        text="I can't add this message",
+                        reply_markup=reply_markup,
+                    )
                     the_bot[reply_chat_id][reply_user_id] = {
-                        "state": "Add", "random message": 0, "message_id": mess["message_id"], "username": the_username(reply_message)}
+                        "state": "Add",
+                        "random message": 0,
+                        "message_id": mess["message_id"],
+                        "username": the_username(reply_message),
+                    }
 
             elif the_bot[reply_chat_id][reply_user_id]["state"] == "DELETE":
 
                 try:
 
-                    chat_id_in_firebase = db.child("all_message").child(
-                        str(reply_chat_id)).shallow().get()
+                    chat_id_in_firebase = (
+                        db.child("all_message")
+                        .child(str(reply_chat_id))
+                        .shallow()
+                        .get()
+                    )
                     all_message_id_in_firebase = []
                     j = 0
                     for i in chat_id_in_firebase.val():
@@ -380,10 +527,12 @@ def replay(update, context):
                         if i == str(message_id_for_reply):
 
                             j += 1
-                            db.child("all_message").child(
-                                str(reply_chat_id)).child(i).remove()
+                            db.child("all_message").child(str(reply_chat_id)).child(
+                                i
+                            ).remove()
                             all_message_id_in_firebase.pop(
-                                all_message_id_in_firebase.index(i))
+                                all_message_id_in_firebase.index(i)
+                            )
 
                     if j == 0:
                         the_message = "I don't have this message"
@@ -397,30 +546,55 @@ def replay(update, context):
                         reply_markup = InlineKeyboardMarkup(keyboard4)
 
                     context.bot.delete_message(
-                        chat_id=reply_chat_id, message_id=the_bot[reply_chat_id][reply_user_id]["message_id"])
+                        chat_id=reply_chat_id,
+                        message_id=the_bot[reply_chat_id][reply_user_id]["message_id"],
+                    )
 
                     try:
                         context.bot.send_message(
-                            chat_id=reply_chat_id, text=the_message, reply_to_message_id=message_id_for_reply,
+                            chat_id=reply_chat_id,
+                            text=the_message,
+                            reply_to_message_id=message_id_for_reply,
                         )
                         mess = context.bot.send_message(
-                            chat_id=reply_chat_id, text="Please choose what you want :", reply_markup=reply_markup,)
+                            chat_id=reply_chat_id,
+                            text="Please choose what you want :",
+                            reply_markup=reply_markup,
+                        )
                         the_bot[reply_chat_id][reply_user_id] = {
-                            "state": "Nothing", "random message": 0, "message_id": mess["message_id"], "username": the_username(reply_message)}
+                            "state": "Nothing",
+                            "random message": 0,
+                            "message_id": mess["message_id"],
+                            "username": the_username(reply_message),
+                        }
 
                     except:
                         reply_markup = InlineKeyboardMarkup(keyboard4)
                         mess = context.bot.send_message(
-                            chat_id=reply_chat_id, text="I can't delete this message", reply_markup=reply_markup)
+                            chat_id=reply_chat_id,
+                            text="I can't delete this message",
+                            reply_markup=reply_markup,
+                        )
                         the_bot[reply_chat_id][reply_user_id] = {
-                            "state": "Nothing", "random message": 0, "message_id": mess["message_id"], "username": the_username(reply_message)}
+                            "state": "Nothing",
+                            "random message": 0,
+                            "message_id": mess["message_id"],
+                            "username": the_username(reply_message),
+                        }
 
                 except TypeError:
                     reply_markup = InlineKeyboardMarkup(keyboard2)
                     mess = context.bot.send_message(
-                        chat_id=reply_chat_id, text="I don't have any massage please add some", reply_markup=reply_markup,)
+                        chat_id=reply_chat_id,
+                        text="I don't have any massage please add some",
+                        reply_markup=reply_markup,
+                    )
                     the_bot[reply_chat_id][reply_user_id] = {
-                        "state": "Nothing", "random message": 0, "message_id": mess["message_id"], "username": the_username(reply_message)}
+                        "state": "Nothing",
+                        "random message": 0,
+                        "message_id": mess["message_id"],
+                        "username": the_username(reply_message),
+                    }
 
     except:
         error = traceback.format_exc()
@@ -436,8 +610,7 @@ def message_receive(update, context):
 
         if message.get("reply_to_message") != None:
             message["reply_to_message"] = my_pop(message["reply_to_message"])
-            message["reply_to_message"] = file_path(
-                message["reply_to_message"])
+            message["reply_to_message"] = file_path(message["reply_to_message"])
 
         message = my_pop(message)
         message = file_path(message)
@@ -449,12 +622,14 @@ def message_receive(update, context):
         chat_id_in_firebase = all_message.val().keys()
 
         if str(message_chat_id) not in chat_id_in_firebase:
-            db2.child("all_message").child(
-                str(message_chat_id)).set({message_id: message})
+            db2.child("all_message").child(str(message_chat_id)).set(
+                {message_id: message}
+            )
 
         else:
-            db2.child("all_message").child(
-                str(message_chat_id)).update({message_id: message})
+            db2.child("all_message").child(str(message_chat_id)).update(
+                {message_id: message}
+            )
 
     except:
         error = traceback.format_exc()
@@ -482,8 +657,7 @@ def main():
     updater.dispatcher.add_handler(CommandHandler("start", start))
     updater.dispatcher.add_handler(CallbackQueryHandler(button))
     updater.dispatcher.add_handler(MessageHandler(Filters.reply, replay))
-    updater.dispatcher.add_handler(
-        MessageHandler(Filters.all, message_receive))
+    updater.dispatcher.add_handler(MessageHandler(Filters.all, message_receive))
     updater.start_polling()
     updater.idle()
 
