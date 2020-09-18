@@ -605,7 +605,7 @@ def replay(update, context):
 def message_receive(update, context):
     message = literal_eval(str(update.message))
     message_chat_id = message["chat"].get("id")
-    
+
     try:
 
         if message.get("reply_to_message") != None:
